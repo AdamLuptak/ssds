@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create S3 bucket with policy which allow read access for HERE cidr
+Parameters:
+  s3ShareBucketName:
+    Type: String
+    Default: emr-job-reporting-share
+    Description: The database backup retention period in days.
+Resources:
+  s3ShareBucketPolicy:
+      Type: "AWS::S3::BucketPolicy"
+      Properties:
+          Bucket:
+            Ref: s3ShareBucketName
+          PolicyDocument:
+            Statement:
+            -
+              Effect: Allow
+              Principal:
+                AWS: "*"
+              Action:
+                - s3:Get*
+                - s3:List*
+              Resource:
+                "Fn::Join": [ "", [ "arn:aws:s3:::", !Ref s3ShareBucketName, "/*" ] ]
+              Condition:
+                IpAddress:
+                  aws:SourceIp:
+                  - 131.228.182.128/25
+                  - 131.228.183.250/31
+                  - 131.228.196.0/23
+                  - 131.228.216.128/27
+                  - 131.228.231.128/25
+                  - 221.148.251.0/25
+                  - 65.167.10.0/23
+                  - 66.54.76.0/22
+                  - 66.54.87.0/24
+                  - 66.51.69.196/32
+                  - 66.54.69.196/32
+                  - 204.120.70.0/23
+  s3ShareBucket:
+        Type: "AWS::S3::Bucket"
+        Properties:
+           BucketName:
+            Ref: s3ShareBucketName

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">Emr Job Report</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="error-report-0.html">Error</a></li>
+            <li class="active"><a href="info-report-0.html">Info</a></li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <h2>Emr Job Info message</h2>
+    <input class="form-control" id="myInput" type="text" placeholder="Search..">
+
+    <table id="myTable" class="table table-hover">
+        <tr>
+            <th>Place of place of revelation</th>
+            <th>Info message</th>
+            <th>Notes</th>
+        </tr>
+        <tr th:each="emrMessage : ${emrInfoMessages}">
+            <td class="col-md-1"  th:text="${emrMessage.placeOfRevelation}">PlaceOfPlaceOfRevelation</td>
+            <td class="col-md-2" th:text="${emrMessage.message}">Notes</td>
+            <td class="col-md-2" th:text="${emrMessage.notes}">Notes</td>
+        </tr>
+    </table>
+    <ul class="pagination" th:each="i : ${#numbers.sequence(0, pages)}">
+        <li th:class="${#strings.equals(page,i)} ? active : ''"><a th:href="'info-report-' + ${i} + '.html'"
+                                                                   th:text="${i}">1</a></li>
+    </ul>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
+</script>
+</body>
+</html>

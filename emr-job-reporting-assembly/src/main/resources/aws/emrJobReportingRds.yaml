@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A basic CloudFormation template for an RDS Aurora PostgreSQL cluster.
+Parameters:
+    DatabaseInstanceType:
+        Default: db.r4.large
+        AllowedValues:
+            - db.r4.large
+            - db.r4.xlarge
+            - db.r4.2xlarge
+            - db.r4.4xlarge
+            - db.r4.8xlarge
+            - db.r4.16xlarge
+        Description: The instance type to use for the database.
+        Type: String
+    DatabasePassword:
+        Default: password
+        AllowedPattern: "[a-zA-Z0-9]+"
+        ConstraintDescription: must contain only alphanumeric characters.
+        Description: The database admin account password.
+        MaxLength: '41'
+        MinLength: '8'
+        NoEcho: 'true'
+        Type: String
+    DatabaseUsername:
+        Default: aurorapg
+        AllowedPattern: "[a-zA-Z0-9]+"
+        ConstraintDescription: must contain only alphanumeric characters.
+        Description: The database admin account user name.
+        MaxLength: '16'
+        MinLength: '1'
+        Type: String
+    DatabaseClusterParameterGroupName:
+        Type: String
+        Default: "default.aurora-postgresql9.6"
+    DatabaseBackupRetentionPeriod:
+        Type: String
+        Default: 35
+        Description: The database backup retention period in days.
+    DatabaseSubnets:
+        Default: "subnet-4d98bb67,subnet-bd3ddcf4"
+        Description: The subnets to place database instances in.
+        Type: List<AWS::EC2::Subnet::Id>
+    DatabaseSecurityGroups:
+        Default: sg-42832a3e
+        Type: List<AWS::EC2::SecurityGroup::Id>
+        Description: Security groups to apply to the RDS cluster.
+    DatabaseName:
+        Default: emrJobReportingRdsCluster
+        Type: String
+        Description: Name of RDS cluster for emr job reporting.
+Metadata:
+    AWS::CloudFormation::Interface:
+        ParameterGroups:
+            - Label:
+                default: default.aurora-postgresql9.6
+              Parameters:
+                - DatabaseInstanceType
+                - DatabaseName
+                - DatabaseUsername
+                - DatabasePassword
+                - DatabaseSubnets
+                - DatabaseSecurityGroups
+                - DatabaseBackupRetentionPeriod
+                - DatabaseClusterParameterGroupName
+        ParameterLabels:
+            DatabaseInstanceType:
+                default: Database Instance Type
+            DatabaseClusterParameterGroupName:
+                default: DB cluster parameter group
+            DatabasePassword:
+                default: Database Password
+            DatabaseUsername:
+                default: Database Username
+            DatabaseBackupRetentionPeriod:
+                default: Database Backup Retention Period
+            DatabaseSubnets:
+                default: Database Subnets
+            DatabaseSecurityGroups:
+                default: Database Security Groups
+Resources:
+    DatabaseSubnetGroup:
+        Type: AWS::RDS::DBSubnetGroup
+        Properties:
+            DBSubnetGroupDescription: CloudFormation managed DB subnet group.
+            SubnetIds:
+                Ref: DatabaseSubnets
+    DatabaseCluster:
+        Type: AWS::RDS::DBCluster
+        Properties:
+            DatabaseName:
+              Ref: DatabaseName
+            Engine: aurora-postgresql
+            MasterUsername:
+                Ref: DatabaseUsername
+            MasterUserPassword:
+                Ref: DatabasePassword
+            BackupRetentionPeriod:
+                Ref: DatabaseBackupRetentionPeriod
+            DBClusterParameterGroupName:
+                Ref: DatabaseClusterParameterGroupName
+            PreferredBackupWindow: 02:00-03:00
+            PreferredMaintenanceWindow: mon:03:00-mon:04:00
+            DBSubnetGroupName:
+                Ref: DatabaseSubnetGroup
+            VpcSecurityGroupIds:
+                Ref: DatabaseSecurityGroups
+    DatabasePrimaryInstance:
+        Type: AWS::RDS::DBInstance
+        Properties:
+            Engine: aurora-postgresql
+            DBClusterIdentifier:
+                Ref: DatabaseCluster
+            DBInstanceClass:
+                Ref: DatabaseInstanceType
+            DBSubnetGroupName:
+                Ref: DatabaseSubnetGroup
+    DatabaseReplicaInstance:
+        Type: AWS::RDS::DBInstance
+        Properties:
+            Engine: aurora-postgresql
+            DBClusterIdentifier:
+                Ref: DatabaseCluster
+            DBInstanceClass:
+                Ref: DatabaseInstanceType
+            DBSubnetGroupName:
+                Ref: DatabaseSubnetGroup
+    DatabaseReplicaInstance2:
+        Type: AWS::RDS::DBInstance
+        Properties:
+            Engine: aurora-postgresql
+            DBClusterIdentifier:
+                Ref: DatabaseCluster
+            DBInstanceClass:
+                Ref: DatabaseInstanceType
+            DBSubnetGroupName:
+                Ref: DatabaseSubnetGroup

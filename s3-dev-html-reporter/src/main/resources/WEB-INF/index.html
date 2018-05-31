@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <style>
+        .notbold{
+    font-weight:normal
+}
+
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"/>
+<div class="container">
+    <div class="jumbotron">
+        <h1>Emr job report</h1>
+        <br>
+        <h2>Emr job: <span th:text=" ${emrJobExecution.jobName}"/></h2>
+        <h2>Emr clusterId: <span th:text="${emrJobExecution.clusterId}"/></h2>
+        <h2>Emr jobStatus: <span th:text="${emrJobExecution.jobStatus}"/></h2>
+        <br>
+        <p><a href="error-report-0.html">To see Error messages: <span th:text="${errorCount}"></span></a>
+        <p><a href="info-report-0.html">To see Info messages: <span th:text="${infoCount}"></span></a></p>
+        </p>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>
